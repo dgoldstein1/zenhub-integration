@@ -1,0 +1,27 @@
+FORMAT: 1A
+
+## Group Github -> Zenhub
+
+Operations pertaining to listening on Github webhooks in order to update Zenhub issues.
+
+## Update Zenhub Pipelines [/updateZenhub]
+
+Updates zenhub from a github request. Available actions are:
+
+- Moving issue to 'in progress' if referenced in branch creation
+- Moving issue to 'ready for review' on merge request creation
+
+### Update Zenhub Pipelines [POST]
+
++ Request (application/json)
+        
+    {}
+
++ Response 200 (application/json)
+
+    {}
+
++ Response 400 (application/json)
+
+    {}
+
