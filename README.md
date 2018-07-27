@@ -61,11 +61,16 @@ You should also be able to see the rest API at `http://localhost:5000/docs/rest.
 
 Deployment is done through your individual heroku account. If you haven't done so already, create an account and add this project.
 
+### Create New Heroku Project
+
 ```sh
 $ heroku create
 ...
 $ heroku open
 ```
+For more information heroku setup, see the [Heroku Documentation on Node JS apps](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
+
+### Configure Zenhub
 
 Then go to `https://dashboard.heroku.com/apps` and click on the name of the you just created. It should be something like "quiet-brushlands-209234". Here you will need to set the required access tokens. You should set three environment variables.
 
@@ -75,20 +80,32 @@ Then go to `https://dashboard.heroku.com/apps` and click on the name of the you 
 
 Enter these into the settings page under "Config Vars".
 
+### Push And Build You Code
+
 To deploy the app with these settings:
 
 ```sh
 # make commit
 $ git push heroku master
 $ heroku logs -t
+...
+2018-07-27T18:42:24.099177+00:00 app[web.1]: Node app is running at localhost:15663
+2018-07-27T18:42:17.000000+00:00 app[api]: Build succeeded
+2018-07-27T18:42:26.302425+00:00 heroku[web.1]: State changed from starting to up
 ```
+
+### Configure Github
 
 The server should now be running. Now we need to configure your github project to send calls to your server.
 
-TODO!!
+- Go to https://github.com/${your-github-name}/${your-project-name}/settings/hooks/new
+- Under "payload URL" enter in the url of the heroku app you just created with an additional "/updateZenhub" (e.g. 'https://warm-lowlands-25366.herokuapp.com/updateZenhub')
+- Content-type should be "application/json"
+- Select "Issues, PRs, and Pushes"
+- Select "submit"
 
+You should see some new activity in the heroku logs and github should confirm the webhook with a green check mark.
 
-For more information on deployment and app setup, see the [Heroku Documentation on Node JS apps](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
 
 
 ## Authors
@@ -100,4 +117,4 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-This project is licensed under the MIT License - see the [license.md](license.md) file for details
+This project is licensed under the Apache License - see the [license.md](license.md) file for details
