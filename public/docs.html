@@ -751,12 +751,21 @@ pre {
 <li><a href="https://nodejs.org/en/" rel="nofollow">Node JS</a></li>
 <li>
 <a href="https://dashboard.heroku.com/" rel="nofollow">Heroku</a> with free account</li>
+<li>
+<a href="http://zenhub.com" rel="nofollow">Zenhub</a> with free account and integration with github</li>
 </ul>
 <h3>
 <a id="user-content-installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h3>
 <p>Install npm packages. This should create a folder "node_modules" at the root directory of the project.</p>
 <pre><code>npm install
 </code></pre>
+<p>Set the required environment variables for local testing. If you don't want to set this up right now, you can set the environment, just fill in the required fields with "NONE".</p>
+<div class="highlight highlight-source-shell"><pre>touch .env
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">ZENHUB_REPO_ID=NONE</span>
+<span class="pl-s">ZENHUB_ACCESS_TOKEN=NONE</span>
+<span class="pl-s">ZENHUB_POSITION=NONE</span>
+<span class="pl-s"><span class="pl-pds">"</span></span> <span class="pl-k">&gt;&gt;</span> .env</pre></div>
 <p>Serve up the app locally. It should run on <code>http://localhost:5000</code>.</p>
 <pre><code>heroku local
 </code></pre>
@@ -767,16 +776,43 @@ pre {
 <h2>
 <a id="user-content-deployment" class="anchor" href="#deployment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Deployment</h2>
 <p>Deployment is done through your individual heroku account. If you haven't done so already, create an account and add this project.</p>
+<h3>
+<a id="user-content-create-new-heroku-project" class="anchor" href="#create-new-heroku-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create New Heroku Project</h3>
 <div class="highlight highlight-source-shell"><pre>$ heroku create
 ...
 $ heroku open</pre></div>
-<p>This should open the deployed version of the app. To deploy a preexisting app, the workflow is:</p>
+<p>For more information heroku setup, see the <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs" rel="nofollow">Heroku Documentation on Node JS apps</a></p>
+<h3>
+<a id="user-content-configure-zenhub" class="anchor" href="#configure-zenhub" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configure Zenhub</h3>
+<p>Then go to <code>https://dashboard.heroku.com/apps</code> and click on the name of the you just created. It should be something like "quiet-brushlands-209234". Here you will need to set the required access tokens. You should set three environment variables.</p>
+<ul>
+<li>"ZENHUB_ACCESS_TOKEN" - go to <a href="https://app.zenhub.com/dashboard/tokens" rel="nofollow">https://app.zenhub.com/dashboard/tokens</a> and generate a token for the project you would like to use. This should be an 80 character long token of numbers and digits.</li>
+<li>"ZENHUB_REPO_ID" - go to <a href="https://app.zenhub.com/" rel="nofollow">https://app.zenhub.com/</a> and select the board you want. See that the URL becomes something like "<a href="https://app.zenhub.com/workspace/o/dgoldstein1/zenhub-integration/boards?repos=142593524" rel="nofollow">https://app.zenhub.com/workspace/o/dgoldstein1/zenhub-integration/boards?repos=142593524</a>". Copy and paste the last number after "repos="</li>
+<li>"ZENHUB_POSITION" - This is where you would like the issues to go on each pipeline, choices are "top" or "botton". Most people do "top".</li>
+</ul>
+<p>Enter these into the settings page under "Config Vars".</p>
+<h3>
+<a id="user-content-push-and-build-you-code" class="anchor" href="#push-and-build-you-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Push And Build You Code</h3>
+<p>To deploy the app with these settings:</p>
 <div class="highlight highlight-source-shell"><pre><span class="pl-c"><span class="pl-c">#</span> make commit</span>
 $ git push heroku master
-$ heroku logs -t</pre></div>
+$ heroku logs -t
+...
+2018-07-27T18:42:24.099177+00:00 app[web.1]: Node app is running at localhost:15663
+2018-07-27T18:42:17.000000+00:00 app[api]: Build succeeded
+2018-07-27T18:42:26.302425+00:00 heroku[web.1]: State changed from starting to up</pre></div>
+<h3>
+<a id="user-content-configure-github" class="anchor" href="#configure-github" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configure Github</h3>
 <p>The server should now be running. Now we need to configure your github project to send calls to your server.</p>
-<p>TODO!!</p>
-<p>For more information on deployment and app setup, see the <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs" rel="nofollow">Heroku Documentation on Node JS apps</a></p>
+<ul>
+<li>Go to <a href="https://github.com/%24%7Byour-github-name%7D/%24%7Byour-project-name%7D/settings/hooks/new">https://github.com/${your-github-name}/${your-project-name}/settings/hooks/new</a>
+</li>
+<li>Under "payload URL" enter in the url of the heroku app you just created with an additional "/updateZenhub" (e.g. '<a href="https://warm-lowlands-25366.herokuapp.com/updateZenhub" rel="nofollow">https://warm-lowlands-25366.herokuapp.com/updateZenhub</a>')</li>
+<li>Content-type should be "application/json"</li>
+<li>Select "Issues, PRs, and Pushes"</li>
+<li>Select "submit"</li>
+</ul>
+<p>You should see some new activity in the heroku logs and github should confirm the webhook with a green check mark.</p>
 <h2>
 <a id="user-content-authors" class="anchor" href="#authors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors</h2>
 <ul>
@@ -790,5 +826,5 @@ $ heroku logs -t</pre></div>
 <p>See also the list of <a href="https://github.com/your/project/contributors">contributors</a> who participated in this project.</p>
 <h2>
 <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
-<p>This project is licensed under the MIT License - see the <a href="/home/davidgoldstein/dev/work/zenhub-integration/license.md">license.md</a> file for details</p>
+<p>This project is licensed under the Apache License - see the <a href="/home/davidgoldstein/dev/work/zenhub-integration/license.md">license.md</a> file for details</p>
 </article></body></html>

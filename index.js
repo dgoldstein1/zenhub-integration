@@ -48,28 +48,22 @@ app.get('/', function(req, res) {
 
 // post update from github -> zenhub
 app.post('/updateZenhub', function(request, response) {
-  var actionTypeArr = validateAction(request.body);
 
-
-  // detect github action type
-  var isBranch = actionTypeArr[0];
-  var isNewIssue = actionTypeArr[1];
-
-  // if is a new branch
-  if (isBranch) {
+  // someone if pushing to a branch
+  if (isPushEvent(request.body)) {
     var issueName = request.body.ref || "";
     var issueNumber = parseInt(issueName.match(/[0-9 , \.]+/g), 10);
 
-    console.log("request issueNumber", issueNumber);
+    // log out data
+    console.log("New Branch Created. Href : ", request.body.ref)
+    console.log("Push event issueNumber", issueNumber);
+
     // move issue to 'in progress' pipeline
     moveIssue(issueNumber, "In Progress").then(res => {
       response.send(JSON.stringify(res));
       return;
     })
   }
-
-  console.log("isBranch", isBranch);
-  console.log("isNewIssue", isNewIssue);
 
   response.send("{Success : true, info : 'no action taken'}")
 })
@@ -125,11 +119,10 @@ function moveIssue(issue_number, pipelineName) {
 // validate github action type //
 /////////////////////////////////
 
-function validateAction(data) {
-  return [isNewBranch(data), isNewIssue(data)];
-}
-function isNewBranch(data) {
-  return _isObject(data) && data.ref_type === "branch";
+function isPushEvent(data) {
+  // see https://developer.github.com/v3/activity/events/types/#pushevent 
+  // for parsing info
+  return data.pusher && data.sender;
 }
 
 function isNewIssue(data) {
