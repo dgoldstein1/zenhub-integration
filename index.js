@@ -37,10 +37,16 @@ function AssertEnvironment() {
   })
 }
 
-//////////////
-// core api //
-//////////////
+/////////////
+// routing //
+/////////////
 
+// re-route '/' to docs page
+app.get('/', function(req, res) {
+   res.redirect('/docs.html');
+});
+
+// post update from github -> zenhub
 app.post('/updateZenhub', function(request, response) {
   var actionTypeArr = validateAction(request.body);
 
