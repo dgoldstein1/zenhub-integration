@@ -12,8 +12,38 @@ app.use(express.static(__dirname + '/public'))
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({extended : true}));     // to support URL-encoded bodies
 
-app.post('/', function(request, response) {
+/////////////
+// on load //
+/////////////
+
+AssertEnvironment()
+
+/**
+ * asserts neccesary environment variables are set in process.env
+ **/
+function AssertEnvironment() {
+  let requiredEnv = [
+    //zenhub
+    "ZENHUB_REPO_ID",
+    "ZENHUB_ACCESS_TOKEN",
+    "ZENHUB_POSITION"
+  ]
+  // assert that all are not null
+  requiredEnv.forEach(env => {
+    if (!process.env[env]) {
+      console.error(`environment variable '${env}' must be declared`)
+      process.exit(1)
+    }
+  })
+}
+
+//////////////
+// core api //
+//////////////
+
+app.post('/updateZenhub', function(request, response) {
   var actionTypeArr = validateAction(request.body);
+
 
   // detect github action type
   var isBranch = actionTypeArr[0];
@@ -42,23 +72,20 @@ app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
 
+//////////////
+// requests //
+//////////////
+
 /**
  * move issue between pipelines
  * 
  * // uri params
  * @param {int} issue_number
  * @param {int} pipelineName
- * @param {int} repo_id
- * @param {string} position (i.e. 'tp[')
  **/
-function moveIssue(issue_number, pipelineName, repo_id, position) {
-  // overload arguments 
-  repo_id = repo_id || "130392688"
-  position = position || "top"
-  var access_token = "8055b53733419dd4147b42f6f9389764003173fbb7d53e469738a1abaed7335928ec6648e36579a3"
-
+function moveIssue(issue_number, pipelineName) {
   // first get board
-  var endpoint = `https://api.zenhub.io/p1/repositories/${repo_id}/board?access_token=${access_token}`
+  var endpoint = `https://api.zenhub.io/p1/repositories/${process.env.ZENHUB_REPO_ID}/board?access_token=${process.env.ZENHUB_ACCESS_TOKEN}`
   console.log("GET " + endpoint)
   return axios.get(endpoint).then(res => {
     if (res.data && res.data.pipelines) {
@@ -74,10 +101,10 @@ function moveIssue(issue_number, pipelineName, repo_id, position) {
       if (pipline_id === "")
         return Promise.resolve({success : false, error : "could not find pipeline " + pipelineName})
       // make request to move issue
-      endpoint = `https://api.zenhub.io/p1/repositories/${repo_id}/issues/${issue_number}/moves?access_token=${access_token}`
+      endpoint = `https://api.zenhub.io/p1/repositories/${process.env.ZENHUB_REPO_ID}/issues/${issue_number}/moves?access_token=${process.env.ZENHUB_ACCESS_TOKEN}`
       var body = {
         pipeline_id : pipline_id,
-        position : position
+        position : process.env.ZENHUB_POSITION
       }
       console.log("POST " + JSON.stringify(body, null, 2) + endpoint)
       return axios.post(endpoint, body)
