@@ -22,6 +22,7 @@ You will need
 
 - [Node JS](https://nodejs.org/en/)
 - [Heroku](https://dashboard.heroku.com/) with free account
+- [Zenhub](http://zenhub.com) with free account and integration with github
 
 
 ### Installing
@@ -29,6 +30,17 @@ You will need
 Install npm packages. This should create a folder "node_modules" at the root directory of the project.
 ```
 npm install
+```
+
+Set the required environment variables for local testing. If you don't want to set this up right now, you can set the environment, just fill in the required fields with "NONE".
+
+```sh
+touch .env
+echo "
+ZENHUB_REPO_ID=NONE
+ZENHUB_ACCESS_TOKEN=NONE
+ZENHUB_POSITION=NONE
+" >> .env
 ```
 
 Serve up the app locally. It should run on `http://localhost:5000`.
@@ -55,7 +67,15 @@ $ heroku create
 $ heroku open
 ```
 
-This should open the deployed version of the app. To deploy a preexisting app, the workflow is:
+Then go to `https://dashboard.heroku.com/apps` and click on the name of the you just created. It should be something like "quiet-brushlands-209234". Here you will need to set the required access tokens. You should set three environment variables.
+
+- "ZENHUB_ACCESS_TOKEN" - go to https://app.zenhub.com/dashboard/tokens and generate a token for the project you would like to use. This should be an 80 character long token of numbers and digits.
+- "ZENHUB_REPO_ID" - go to https://app.zenhub.com/ and select the board you want. See that the URL becomes something like "https://app.zenhub.com/workspace/o/dgoldstein1/zenhub-integration/boards?repos=142593524". Copy and paste the last number after "repos="
+- "ZENHUB_POSITION" - This is where you would like the issues to go on each pipeline, choices are "top" or "botton". Most people do "top".
+
+Enter these into the settings page under "Config Vars".
+
+To deploy the app with these settings:
 
 ```sh
 # make commit
