@@ -4,13 +4,13 @@ While zenhub registers automatically with github issue tracking, there are some 
 
 - Moving issues between zenhub "in progress" pipeline when a new merge request is created against a preexisting issue
 - Moving issue to "Review Q/A" when a merge request is created for a branch created against an issue
+- Passing of secure keys through environment variables
 
 
 Planned features:
 
 - notifications in slack. E.g. 'Jane Smith has created' merge request "35-update-readme" ready for review for Amanda Doe'
 - support for moving multiple issues for branches with the pattern "35-36-update-readme".
-- Passing of secure keys through environment variables
 
 ## Getting Started
 

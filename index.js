@@ -51,17 +51,29 @@ app.post('/updateZenhub', function(request, response) {
 
   // someone if pushing to a branch
   if (isPushEvent(request.body)) {
-    var issueName = request.body.ref || "";
-    var issueNumber = parseInt(issueName.match(/[0-9 , \.]+/g), 10);
+    var branchName = request.body.ref || "";
+    var issueNumber = parseInt(branchName.match(/[0-9 , \.]+/g), 10);
 
     // log out data
-    console.log("New Branch Created. Href : ", request.body.ref)
     console.log("Push event issueNumber", issueNumber);
+    console.log("New Branch Created. Href : ", branchName)
 
     // move issue to 'in progress' pipeline
     moveIssue(issueNumber, "In Progress").then(res => {
       response.send(JSON.stringify(res));
       return;
+    })
+  } else if (isPullRequestOpen(request.body)) {
+    // someone is opening a new PR against an issue
+    var branchName = request.body.pull_request.head.ref || "";
+    var issueNumber = parseInt(branchName.match(/[0-9 , \.]+/g), 10);
+
+    console.log("New PR Create. Ref : ", branchName)
+    console.log("PR created against issueNumber", issueNumber);
+
+    // move issue to "Review/QA" pipeline
+    moveIssue(issueNumber, "Review/QA").then(res => {
+      return response.send(JSON.stringify(res));
     })
   }
 
@@ -123,6 +135,12 @@ function isPushEvent(data) {
   // see https://developer.github.com/v3/activity/events/types/#pushevent 
   // for parsing info
   return data.pusher && data.sender;
+}
+
+function isPullRequestOpen(data) {
+  // https://developer.github.com/v3/activity/events/types/#pullrequestevent
+  // returns true when data is someone opening a pr against an issue
+  return data.pull_request && data.action === "opened"
 }
 
 function isNewIssue(data) {
