@@ -111,7 +111,7 @@ You should see some new activity in the heroku logs and github should confirm th
 ## Authors
 
 * **Karina Yang**  - [Decipher Technology Studios](http://deciphernow.com/)
-* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/) - [Decipher Technology Studios](http://deciphernow.com/)
+* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/?github-zenhub-integration) - [Decipher Technology Studios](http://deciphernow.com/)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
